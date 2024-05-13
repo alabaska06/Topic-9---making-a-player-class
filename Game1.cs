@@ -7,9 +7,7 @@ namespace Topic_9___making_a_player_class
 {
     public class Game1 : Game
     {
-        Player blob;
-
-        Food food1, food2, food3;
+        Player blob, blob2;
 
         Rectangle window;
 
@@ -20,7 +18,7 @@ namespace Topic_9___making_a_player_class
         Texture2D whiteSqaure;
 
         List<Rectangle> barriers;
-        List<Rectangle> food;
+        List<Food> food;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -42,17 +40,16 @@ namespace Topic_9___making_a_player_class
 
             window = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
 
-            food1 = new Food (whiteCircle, new Rectangle(50, 50, 10, 10), new Vector2(0,2));
-            food2 = new Food (whiteCircle, new Rectangle(600, 100, 10, 10));
-            food3 = new Food (whiteCircle, new Rectangle(50, 200, 10, 10));
-
-            food = new List<Rectangle>();
-            food.Add(food1.Bounds);
-            food.Add(food2.Bounds);
-            food.Add(food3.Bounds);
+            food = new List<Food>();
+            food.Add(new Food(whiteCircle, new Rectangle(50, 50, 10, 10), new Vector2(0, 2)));
+            food.Add(new Food(whiteCircle, new Rectangle(600, 100, 10, 10)));
+            food.Add(new Food(whiteCircle, new Rectangle(50, 200, 10, 10)));
 
             base.Initialize();
             blob = new Player(blobTexture, 10, 10, window);
+            blob2 = new Player(blobTexture, 760, 10, window);
+            blob2.ColorMask = Color.Green;
+            
         }
 
         protected override void LoadContent()
@@ -61,6 +58,7 @@ namespace Topic_9___making_a_player_class
             blobTexture = Content.Load<Texture2D>("blob");
             whiteCircle = Content.Load<Texture2D>("whiteCircle");
             whiteSqaure = Content.Load<Texture2D>("whiteSquare");
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -86,23 +84,48 @@ namespace Topic_9___making_a_player_class
 
             blob.Update();
 
-            food1.Move(_graphics);
-            food2.Move(_graphics);
-            food3.Move(_graphics);
+
+            blob2.HSpeed = 0;
+            blob2.VSpeed = 0;
+
+            if (keyboardState.IsKeyDown(Keys.Right))
+                blob2.HSpeed += 3;
+            if (keyboardState.IsKeyDown(Keys.Left))
+                blob2.HSpeed += -3;
+            if (keyboardState.IsKeyDown(Keys.Up))
+                blob2.VSpeed += -3;
+            if (keyboardState.IsKeyDown(Keys.Down))
+                blob2.VSpeed += 3;
+
+            blob2.Update();
+
+            foreach (Food bit in food)
+            {
+                bit.Move(_graphics);
+            }
 
             foreach (Rectangle barrier in barriers)
                 if (blob.Collide(barrier))
                     blob.UndoMove();
 
+            foreach (Rectangle barrier in barriers)
+                if (blob2.Collide(barrier))
+                    blob2.UndoMove();
+
             for (int i = 0; i < food.Count; i++)
-                if (blob.Collide(food[i]))
+                if (blob.Collide(food[i].Bounds))
                 {
                     food.RemoveAt(i);
                     blob.Grow();
                     i--;
                 }
-
-
+            for (int i = 0; i < food.Count; i++)
+                if (blob2.Collide(food[i].Bounds))
+                {
+                    food.RemoveAt(i);
+                    blob2.Grow();
+                    i--;
+                }
 
             // TODO: Add your update logic here
 
@@ -116,16 +139,13 @@ namespace Topic_9___making_a_player_class
             _spriteBatch.Begin();
 
             blob.Draw(_spriteBatch);
+            blob2.Draw(_spriteBatch);
 
             foreach (Rectangle barrier in barriers)
                 _spriteBatch.Draw(whiteSqaure, barrier, Color.White);
 
-            //foreach (Rectangle bit in food)
-            //    _spriteBatch.Draw(whiteCircle, bit, Color.Green);
-
-            _spriteBatch.Draw(whiteCircle, food1.Bounds, Color.White);
-            _spriteBatch.Draw(whiteCircle, food2.Bounds, Color.White);
-            _spriteBatch.Draw(whiteCircle, food3.Bounds, Color.White);
+            foreach (Food bit in food)
+                _spriteBatch.Draw(whiteCircle, bit.Bounds, Color.Green);
 
             _spriteBatch.End();
 

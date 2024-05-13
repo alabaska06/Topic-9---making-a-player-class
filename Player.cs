@@ -14,6 +14,7 @@ namespace Topic_9___making_a_player_class
         private Rectangle _location;
         private Vector2 _speed;
         private Rectangle _window;
+        private Color _color;
 
         public Player(Texture2D texture, int x, int y, Rectangle window)
         {
@@ -21,11 +22,17 @@ namespace Topic_9___making_a_player_class
             _location = new Rectangle(x, y, 30, 30);
             _speed = new Vector2();
             _window = window;
+            _color = Color.White;
         }
         public float HSpeed
         {
             get { return _speed.X; }
             set { _speed.X = value; }
+        }
+        public Color ColorMask
+        {
+            get { return _color; }
+            set { _color = value; }
         }
         public float VSpeed
         {
@@ -46,7 +53,7 @@ namespace Topic_9___making_a_player_class
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, _location, Color.White);
+            spriteBatch.Draw(_texture, _location, _color);
         }
         public bool Collide(Rectangle item)
         {
